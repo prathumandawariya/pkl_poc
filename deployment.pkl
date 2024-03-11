@@ -1,0 +1,46 @@
+import "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1#/K8sResource.pkl"
+import "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1#/api/apps/v1/Deployment.pkl"
+
+resources: Listing<K8sResource> = new {
+  new Deployment {
+    metadata {
+      name = "app"
+    }
+    spec {
+      replicas = 1
+      selector {
+        matchLabels {
+          ["app"] = "app"
+        }
+      }
+      template {
+        metadata {
+          labels {
+            ["app"] = "app"
+          }
+        }
+        spec {
+          containers {
+            new {
+              name = "app"
+              image = "prathu1993/app"
+              imagePullPolicy = "Always"
+              ports {
+                new {
+                  containerPort = 8080
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+output {
+  value = resources
+  renderer = (K8sResource.output.renderer as YamlRenderer) {
+    isStream = true
+  }
+}

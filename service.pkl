@@ -1,0 +1,30 @@
+import "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1#/K8sResource.pkl"
+import "package://pkg.pkl-lang.org/pkl-k8s/k8s@1.0.1#/api/core/v1/Service.pkl"
+
+resources: Listing<K8sResource> = new {
+  new Service {
+    metadata {
+      name = "app"
+    }
+    spec {
+      selector {
+        ["app"] = "app"
+      }
+      ports {
+        new {
+          protocol = "TCP"
+          port = 8080
+          targetPort = 8080
+        }
+      }
+      type = "NodePort"
+    }
+  }
+}
+
+output {
+  value = resources
+  renderer = (K8sResource.output.renderer as YamlRenderer) {
+    isStream = true
+  }
+}
